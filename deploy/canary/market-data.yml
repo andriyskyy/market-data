@@ -14,7 +14,11 @@ spec:
     spec:
       containers:
       - name: market-data
-        image: BUILD_TAG
+        image: morganjbruce/market-data:v2
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
         ports:
         - containerPort: 8000
         livenessProbe:

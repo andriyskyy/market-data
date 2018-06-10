@@ -1,6 +1,4 @@
-def label = "pod-${UUID.randomUUID().toString()}"
-
-def withPod(body) {
+def withPod(label, body) {
   podTemplate(label: label, containers: [
       containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
       containerTemplate(name: 'kubectl', image: 'wernight/kubectl', command: 'cat', ttyEnabled: true)
@@ -11,7 +9,9 @@ def withPod(body) {
  ) { body() }
 }
 
-withPod {
+def label = "pod-${UUID.randomUUID().toString()}"
+
+withPod(label) {
   node(label) {
     def tag = "${env.BRANCH_NAME}.${env.BUILD_NUMBER}"
     def service = "market-data:${tag}"

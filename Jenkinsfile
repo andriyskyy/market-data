@@ -12,11 +12,13 @@ withPod {
   node('pod') {
     def tag = "${env.BRANCH_NAME}.${env.BUILD_NUMBER}"
     def service = "market-data:${tag}"
-
+    
     checkout scm
 
     stage('Build') {
-      sh("docker build -t ${service} .")
+      container('docker') {
+        sh("docker build -t ${service} .")
+      }
     }
   }
 }

@@ -21,7 +21,7 @@ withPod {
       }
       
       stage('Test') {
-        sh("docker run --rm ${service} python setup.py test")
+        sh("docker run --rm ${service} py.test --junitxml /workspace/results.xml")
       }
     }
   }

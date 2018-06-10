@@ -15,8 +15,8 @@ withPod {
     
     checkout scm
 
-    stage('Build') {
-      container('docker') {
+    container('docker') {
+      stage('Build') {
         sh("docker build -t ${service} .")
       }
     }

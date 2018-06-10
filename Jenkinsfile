@@ -44,17 +44,16 @@ withPod(label) {
       sh("sed -i.bak 's#BUILD_TAG#${tagToDeploy}#' ./deploy/staging/*.yml")
 
       container('kubectl') {
-        sh("kubectl --namespace=staging apply -f deploy/staging/")
+        sh("kubectl --namespace=staging apply -f deploy/staging")
       }
 
-        try {
-          container('kubectl') {
-            sh("kubectl --namespace=staging rollout status --request-timeout='5m' deployment/market-data")
-          }
-        } catch(Exception e) {
-          sh("kubectl --namespace=staging rollout undo deployment/market-data")
-          throw e
+      try {
+        container('kubectl') {
+          sh("kubectl --namespace=staging rollout status --request-timeout='5m' deployment/market-data")
         }
+      } catch(Exception e) {
+        sh("kubectl --namespace=staging rollout undo deployment/market-data")
+        throw e
       }
     }
   }

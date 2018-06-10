@@ -13,6 +13,7 @@ withPod {
   node('pod') {
     def tag = "${env.BRANCH_NAME}.${env.BUILD_NUMBER}"
     def service = "market-data:${tag}"
+    def tagToDeploy = "morganjbruce/${service}"
 
     checkout scm
 
@@ -30,8 +31,6 @@ withPod {
       }
 
       stage('Publish') {
-        def tagToDeploy = "morganjbruce/${service}"
-
         withDockerRegistry(registry: [credentialsId: 'dockerhub']) {
           sh("docker tag ${service} ${tagToDeploy}")
           sh("docker push ${tagToDeploy}")

@@ -1,5 +1,5 @@
 def withPod(label, body) {
-  podTemplate(label: label, containers: [
+  podTemplate(label: label, serviceAccount: 'jenkins', containers: [
       containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
       containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl', command: 'cat', ttyEnabled: true)
     ],
@@ -40,11 +40,18 @@ withPod(label) {
     //   }
     // }
 
-    stage('Deploy to staging') {
+    stage('Deploy') {
       sh("sed -i.bak 's#BUILD_TAG#${tagToDeploy}#' ./deploy/staging/*.yml")
 
       container('kubectl') {
         sh("kubectl --namespace=staging apply -f deploy/staging/")
+
+        try {
+          sh("kubectl rollout status --request-timeout='5m' deployment/market-data") #A
+        } catch(Exception e) {
+          sh("kubectl rollout undo deployment/market-data")#B
+          throw e #C
+        }
       }
     }
   }

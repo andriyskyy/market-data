@@ -1,7 +1,7 @@
 def withPod(label, body) {
   podTemplate(label: label, serviceAccount: 'jenkins', containers: [
-      containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
-      containerTemplate(name: 'kubectl', image: 'morganjbruce/kubectl', command: 'cat', ttyEnabled: true)
+      containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true)
+      // containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl', command: 'cat', ttyEnabled: true)
     ],
     volumes: [
       hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock'),
@@ -43,13 +43,15 @@ withPod(label) {
     stage('Deploy') {
       sh("sed -i.bak 's#BUILD_TAG#${tagToDeploy}#' ./deploy/staging/*.yml")
 
-      container('kubectl') {
-        sh("kubectl --namespace=staging apply -f deploy/staging")
+      container('docker') {
+        def kubectl = "docker run --rm lachlanevenson/k8s-kubectl --namespace=staging"
+
+        sh("${kubectl} apply -f deploy/staging")
 
         try {
-            sh("kubectl --namespace=staging rollout status --request-timeout=5m deployment/market-data")
+            sh("${kubectl} rollout status --request-timeout=5m deployment/market-data")
         } catch(Exception e) {
-          sh("kubectl --namespace=staging rollout undo deployment/market-data")
+          sh("${kubectl} rollout undo deployment/market-data")
           throw e
         }
       }

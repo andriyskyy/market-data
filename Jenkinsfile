@@ -47,9 +47,9 @@ withPod(label) {
         sh("kubectl --namespace=staging apply -f deploy/staging/")
 
         try {
-          sh("kubectl rollout status --request-timeout='5m' deployment/market-data")
+          sh("kubectl --namespace=staging rollout status --request-timeout='5m' deployment/market-data")
         } catch(Exception e) {
-          sh("kubectl rollout undo deployment/market-data")
+          sh("kubectl --namespace=staging rollout undo deployment/market-data")
           throw e
         }
       }

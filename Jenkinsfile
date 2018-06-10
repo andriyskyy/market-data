@@ -47,7 +47,7 @@ withPod(label) {
         sh("kubectl --namespace=staging apply -f deploy/staging")
 
         try {
-          sh("kubectl --namespace=staging --server https://kubernetes.default rollout status --request-timeout=5m deployment/market-data")
+          sh("kubectl --namespace=staging --server=https://192.168.99.100:8443 rollout status --request-timeout=5m deployment/market-data")
         } catch(Exception e) {
           sh("kubectl --namespace=staging rollout undo deployment/market-data")
           throw e

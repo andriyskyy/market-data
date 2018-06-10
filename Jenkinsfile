@@ -23,11 +23,11 @@ withPod {
       stage('Test') {
         try {
           sh("""docker run \
-              -v `pwd`:/workspace -w workspace \ #A
+              -v `pwd`:/workspace -w workspace \
            --rm ${service} \
               py.test --junitxml results.xml""")
         } finally {
-          step([$class: 'JUnitResultArchiver', testResults: 'results.xml']) #B
+          step([$class: 'JUnitResultArchiver', testResults: 'results.xml'])
         }
       }
     }
